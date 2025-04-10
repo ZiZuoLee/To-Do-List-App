@@ -26,6 +26,7 @@ import {
   Logout as LogoutIcon,
   PushPin as PinIcon,
   Add as AddSubtitleIcon,
+  Person as PersonIcon,
 } from '@mui/icons-material';
 import { useAuth } from '../context/AuthContext';
 import axios from 'axios';
@@ -211,6 +212,13 @@ const Dashboard = () => {
           <Typography variant="subtitle1" sx={{ mr: 2 }}>
             Welcome, {user?.username}
           </Typography>
+          <IconButton 
+            color="inherit" 
+            onClick={() => navigate('/profile')}
+            sx={{ mr: 1 }}
+          >
+            <PersonIcon />
+          </IconButton>
           <IconButton color="inherit" onClick={handleLogout}>
             <LogoutIcon />
           </IconButton>
