@@ -2,9 +2,11 @@ import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Box, Typography, TextField, Button, Paper, Alert } from '@mui/material';
 import axios from 'axios';
+import { useAuth } from '../context/AuthContext';
 
 const Profile = () => {
   const navigate = useNavigate();
+  const { user, login } = useAuth();
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
   const [success, setSuccess] = useState('');
@@ -88,6 +90,15 @@ const Profile = () => {
         }
       );
 
+      console.log('Profile update response:', response.data);
+
+      // Update user data in localStorage
+      const updatedUser = { ...user, username: formData.username, email: formData.email };
+      localStorage.setItem('user', JSON.stringify(updatedUser));
+
+      // Re-login to update the auth context
+      await login(formData.email, formData.newPassword || formData.currentPassword);
+
       setSuccess('Profile updated successfully');
       // Reset password fields after successful update
       setFormData(prev => ({
@@ -98,7 +109,9 @@ const Profile = () => {
       }));
     } catch (err) {
       console.error('Error updating profile:', err);
-      setError(err.response?.data?.message || 'Failed to update profile');
+      console.error('Error response:', err.response?.data);
+      const errorMessage = err.response?.data?.message || 'Failed to update profile';
+      setError(errorMessage);
     }
   };
 
@@ -194,6 +207,18 @@ const Profile = () => {
           >
             Update Profile
           </Button>
+
+          {success && (
+            <Button
+              variant="outlined"
+              color="primary"
+              fullWidth
+              sx={{ mt: 2 }}
+              onClick={() => navigate('/dashboard')}
+            >
+              Back to Dashboard
+            </Button>
+          )}
         </form>
       </Paper>
     </Box>
