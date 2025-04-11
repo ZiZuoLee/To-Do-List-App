@@ -4,6 +4,7 @@ const dotenv = require('dotenv');
 const db = require('./config/db');
 const authRoutes = require('./routes/auth');
 const todoRoutes = require('./routes/todos');
+const adminRoutes = require('./routes/admin');
 
 // Load environment variables
 dotenv.config();
@@ -17,6 +18,7 @@ app.use(express.json());
 // Routes
 app.use('/api/auth', authRoutes);
 app.use('/api/todos', todoRoutes);
+app.use('/api/admin', adminRoutes);
 
 // Basic route
 app.get('/', (req, res) => {

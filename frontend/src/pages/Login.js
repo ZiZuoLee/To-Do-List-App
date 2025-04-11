@@ -36,11 +36,13 @@ const Login = () => {
     if (result.success) {
       setNotification({
         open: true,
-        message: 'Login successful! Redirecting to dashboard...',
+        message: formData.email === 'admin@gmail.com' 
+          ? 'Login successful! Redirecting to admin panel...'
+          : 'Login successful! Redirecting to dashboard...',
         severity: 'success',
       });
       setTimeout(() => {
-        navigate('/dashboard');
+        navigate(formData.email === 'admin@gmail.com' ? '/admin' : '/dashboard');
       }, 2000);
     } else {
       setNotification({

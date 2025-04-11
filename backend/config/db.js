@@ -1,5 +1,6 @@
 const mysql = require('mysql2/promise');
 require('dotenv').config();
+const bcrypt = require('bcrypt');
 
 const pool = mysql.createPool({
   host: process.env.DB_HOST,
@@ -48,6 +49,20 @@ async function initializeDatabase() {
       )
     `);
     console.log('Todos table created or already exists');
+
+    // Create admin user if it doesn't exist
+    const adminEmail = 'admin@gmail.com';
+    const adminPassword = await bcrypt.hash('admin123', 10); // You should change this password in production
+    
+    await connection.query(`
+      INSERT INTO users (username, email, password)
+      SELECT 'admin', ?, ?
+      WHERE NOT EXISTS (
+        SELECT 1 FROM users WHERE email = ?
+      )
+    `, [adminEmail, adminPassword, adminEmail]);
+    
+    console.log('Admin user created or already exists');
 
     connection.release();
   } catch (error) {

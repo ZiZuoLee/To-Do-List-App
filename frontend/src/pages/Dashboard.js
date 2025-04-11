@@ -212,6 +212,15 @@ const Dashboard = () => {
           <Typography variant="subtitle1" sx={{ mr: 2 }}>
             Welcome, {user?.username}
           </Typography>
+          {user?.email === 'admin@gmail.com' && (
+            <Button
+              color="inherit"
+              onClick={() => navigate('/admin')}
+              sx={{ mr: 1 }}
+            >
+              Admin Panel
+            </Button>
+          )}
           <IconButton 
             color="inherit" 
             onClick={() => navigate('/profile')}
