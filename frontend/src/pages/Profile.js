@@ -214,9 +214,9 @@ const Profile = () => {
               color="primary"
               fullWidth
               sx={{ mt: 2 }}
-              onClick={() => navigate('/dashboard')}
+              onClick={() => navigate(user.email === 'admin@gmail.com' ? '/admin' : '/dashboard')}
             >
-              Back to Dashboard
+              Back to {user.email === 'admin@gmail.com' ? 'Admin Dashboard' : 'Dashboard'}
             </Button>
           )}
         </form>
