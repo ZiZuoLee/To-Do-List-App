@@ -1,8 +1,9 @@
 import React, { useState, useEffect } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, Link as RouterLink } from 'react-router-dom';
 import { Box, Typography, TextField, Button, Paper, Alert } from '@mui/material';
 import axios from 'axios';
 import { useAuth } from '../context/AuthContext';
+import ArrowBackIcon from '@mui/icons-material/ArrowBack';
 
 const Profile = () => {
   const navigate = useNavigate();
@@ -125,6 +126,12 @@ const Profile = () => {
 
   return (
     <Box sx={{ maxWidth: 600, mx: 'auto', mt: 4, p: 3 }}>
+      <Box sx={{ display: 'flex', alignItems: 'center', mb: 2 }}>
+        <Button component={RouterLink} to="/dashboard" startIcon={<ArrowBackIcon />} variant="outlined" sx={{ mr: 2 }}>
+          Back to Dashboard
+        </Button>
+        <Typography variant="h5" gutterBottom fontWeight={700}>Profile</Typography>
+      </Box>
       <Paper elevation={3} sx={{ p: 4 }}>
         <Typography variant="h4" gutterBottom>
           Profile Settings

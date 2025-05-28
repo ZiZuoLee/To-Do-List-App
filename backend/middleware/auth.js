@@ -27,4 +27,11 @@ module.exports = async (req, res, next) => {
     console.error('Auth middleware error:', error);
     res.status(401).json({ message: 'Token is not valid' });
   }
+};
+
+module.exports.verifyToken = async function(token) {
+  const decoded = jwt.verify(token, process.env.JWT_SECRET);
+  const [users] = await db.query('SELECT * FROM users WHERE id = ?', [decoded.userId]);
+  if (users.length === 0) throw new Error('User not found');
+  return users[0];
 }; 

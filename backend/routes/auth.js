@@ -4,6 +4,21 @@ const bcrypt = require('bcryptjs');
 const jwt = require('jsonwebtoken');
 const db = require('../config/db');
 const auth = require('../middleware/auth');
+const multer = require('multer');
+const path = require('path');
+const fs = require('fs');
+
+// Set up multer storage for avatars
+const avatarDir = path.join(__dirname, '../uploads/avatars');
+if (!fs.existsSync(avatarDir)) fs.mkdirSync(avatarDir, { recursive: true });
+const storage = multer.diskStorage({
+  destination: (req, file, cb) => cb(null, avatarDir),
+  filename: (req, file, cb) => {
+    const unique = Date.now() + '-' + Math.round(Math.random() * 1e9);
+    cb(null, unique + '-' + file.originalname.replace(/\s+/g, '_'));
+  }
+});
+const upload = multer({ storage });
 
 // Register a new user
 router.post('/register', async (req, res) => {
@@ -173,6 +188,14 @@ router.put('/update-profile', auth, async (req, res) => {
     console.error('Error updating profile:', err);
     res.status(500).json({ message: 'Server error' });
   }
+});
+
+// Avatar upload endpoint
+router.post('/avatar', auth, upload.single('avatar'), async (req, res) => {
+  if (!req.file) return res.status(400).json({ message: 'No file uploaded' });
+  const avatarUrl = `/uploads/avatars/${req.file.filename}`;
+  await db.query('UPDATE users SET avatar = ? WHERE id = ?', [avatarUrl, req.user.id]);
+  res.json({ url: avatarUrl });
 });
 
 module.exports = router; 

@@ -21,23 +21,50 @@ const isAdmin = async (req, res, next) => {
 router.get('/users', auth, isAdmin, async (req, res) => {
   try {
     const [users] = await db.query(`
-      SELECT 
-        u.id,
-        u.username,
-        u.email,
-        u.created_at,
-        COALESCE(MAX(t.updated_at), u.created_at) as last_active,
-        COUNT(t.id) as todo_count
+      SELECT u.id, u.username, u.email, GROUP_CONCAT(r.name) as roles
       FROM users u
-      LEFT JOIN todos t ON u.id = t.user_id
+      LEFT JOIN user_roles ur ON u.id = ur.user_id
+      LEFT JOIN roles r ON ur.role_id = r.id
       GROUP BY u.id
-      ORDER BY u.created_at DESC
     `);
-    
     res.json(users);
   } catch (error) {
-    console.error('Error fetching users:', error);
-    res.status(500).json({ message: 'Error fetching users' });
+    console.error('Error fetching users with roles:', error);
+    res.status(500).json({ message: 'Error fetching users with roles' });
+  }
+});
+
+// Assign a role to a user
+router.post('/users/:id/roles', auth, isAdmin, async (req, res) => {
+  try {
+    const { role_id } = req.body;
+    await db.query('INSERT IGNORE INTO user_roles (user_id, role_id) VALUES (?, ?)', [req.params.id, role_id]);
+    res.json({ message: 'Role assigned' });
+  } catch (error) {
+    console.error('Error assigning role:', error);
+    res.status(500).json({ message: 'Error assigning role' });
+  }
+});
+
+// Remove a role from a user
+router.delete('/users/:id/roles/:role_id', auth, isAdmin, async (req, res) => {
+  try {
+    await db.query('DELETE FROM user_roles WHERE user_id = ? AND role_id = ?', [req.params.id, req.params.role_id]);
+    res.json({ message: 'Role removed' });
+  } catch (error) {
+    console.error('Error removing role:', error);
+    res.status(500).json({ message: 'Error removing role' });
+  }
+});
+
+// List all teams
+router.get('/teams', auth, isAdmin, async (req, res) => {
+  try {
+    const [teams] = await db.query('SELECT * FROM teams');
+    res.json(teams);
+  } catch (error) {
+    console.error('Error fetching teams:', error);
+    res.status(500).json({ message: 'Error fetching teams' });
   }
 });
 
